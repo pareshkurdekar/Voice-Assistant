@@ -16,7 +16,7 @@ roger.setProperty('voice', 'english_us')
 '''
 
 def speak(text):
-    tts = gTTS(text=text, lang='en',slow=False)
+    tts = gTTS(text=text, lang='en-uk',slow=False)
     filename ='speech.mp3'
     tts.save(filename)
     playsound.playsound(filename)
@@ -49,11 +49,31 @@ def joke():
     speak(setup)
     print(punchline)
     speak(punchline)
+def dictionary(word):
+    url = 'https://api.dictionaryapi.dev/api/v2/entries/'
+    lang_code = 'en'
+    #word = 'new'
+    final_url = url + lang_code + '/' + word
+    #print(final_url)
+    fh = urllib.request.urlopen(final_url).read().decode()
+    data = json.loads(fh)
+    #print(json.dumps(data, indent =2))
+    #print(data[0]["meanings"][0]["definitions"][0]["definition"])
+    definition = data[0]["meanings"][0]["definitions"][0]["definition"]
+    print(definition)
+    speak("Definition:")
+    speak(definition)
+    meaning_len =  len(data[0]["meanings"][0]["definitions"][0]["synonyms"])
+    meaning = data[0]["meanings"][0]["definitions"][0]["synonyms"][0:2]
+    speak("Its synonyms are:" + meaning[0] + meaning[1])
+    #speak(meaning[0])
+    #speak(meaning[1])
+    print(meaning)
 
 while(1):
     try:
         with sr.Microphone() as source:
-            #r.adjust_for_ambient_noise(source, duration=0.2)
+            r.adjust_for_ambient_noise(source, duration=0.5)
             audio = r.listen(source)
             text = r.recognize_google(audio)
             print(text.capitalize())
@@ -62,22 +82,36 @@ while(1):
                 os.system("ls -l")
                 speak("These are the files")
 
-            if (text == "update"):
-                os.system("echo %s | sudo -s apt-get update" % ("******"))  # -s for reading from STDIN  Enter Password
+            elif (text == "update"):
+                os.system("echo %s | sudo -s apt-get update" % ("*****"))  # -s for reading from STDIN Enter Password
                 speak("The system is updated")
 
-            if( text == "play music"):
-                speak("Playing favorite songs from Spotify")
+            elif( "play music" in text):
+                speak("Playing songs from rhythmbox")
+                os.system('rhythmbox-client  --play')
+            elif ("next song" in text):
+                speak("Playing Next song")
+                os.system('rhythmbox-client  --next')
+            elif ("stop song" in text):
+                speak("Pausing song")
+                os.system('rhythmbox-client  --pause')
 
-            if( text == "tell me a joke"):
+            elif( "joke" in text):
                 joke()
 
-            if (text.find("weather") != -1):
+            elif( "meaning" in text):
+                #print("Working")
+                word = text.split()[-1]
+                dictionary(word)
+            elif (text.find("weather") != -1):
                 city = text.split()[5]
                 print(city)
                 weather(city)
 
+
     except sr.RequestError as e:
-        print("Could not request results; {0}".format(e))
+        #print("Could not request results; {0}".format(e))
+        continue
     except sr.UnknownValueError:
-        print("unknown error occured")
+        continue
+        #print("unknown error occured")

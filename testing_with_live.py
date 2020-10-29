@@ -63,7 +63,7 @@ while(1):
                 speak("These are the files")
 
             if (text == "update"):
-                os.system("echo %s | sudo -s apt-get update" % ("rugved"))  # -s for reading from STDIN
+                os.system("echo %s | sudo -s apt-get update" % ("******"))  # -s for reading from STDIN  Enter Password
                 speak("The system is updated")
 
             if( text == "play music"):

@@ -16,7 +16,7 @@ roger.setProperty('voice', 'english_us')
 '''
 
 def speak(text):
-    tts = gTTS(text=text, lang='en',slow=False)
+    tts = gTTS(text=text, lang='en-us',slow=False)
     filename ='speech.mp3'
     tts.save(filename)
     playsound.playsound(filename)
@@ -49,6 +49,26 @@ def joke():
     speak(setup)
     print(punchline)
     speak(punchline)
+def dictionary(word):
+    url = 'https://api.dictionaryapi.dev/api/v2/entries/'
+    lang_code = 'en'
+    #word = 'new'
+    final_url = url + lang_code + '/' + word
+    print(final_url)
+    fh = urllib.request.urlopen(final_url).read().decode()
+    data = json.loads(fh)
+    #print(json.dumps(data, indent =2))
+    #print(data[0]["meanings"][0]["definitions"][0]["definition"])
+    definition = data[0]["meanings"][0]["definitions"][0]["definition"]
+    print(definition)
+    speak("Definition:")
+    speak(definition)
+    meaning_len =  len(data[0]["meanings"][0]["definitions"][0]["synonyms"])
+    meaning = data[0]["meanings"][0]["definitions"][0]["synonyms"][0:2]
+    speak("Its synonyms are:" + meaning[0] + meaning[1])
+    #speak(meaning[0])
+    #speak(meaning[1])
+    print(meaning)
 
 while(1):
     try:
@@ -63,15 +83,18 @@ while(1):
                 speak("These are the files")
 
             if (text == "update"):
-                os.system("echo %s | sudo -s apt-get update" % ("******"))  # -s for reading from STDIN  Enter Password
+                os.system("echo %s | sudo -s apt-get update" % ("rugved"))  # -s for reading from STDIN
                 speak("The system is updated")
 
             if( text == "play music"):
                 speak("Playing favorite songs from Spotify")
 
-            if( text == "tell me a joke"):
+            if( "joke" in text):
                 joke()
-
+            if( "meaning" in text):
+                #print("Working")
+                word = text.split()[-1]
+                dictionary(word)
             if (text.find("weather") != -1):
                 city = text.split()[5]
                 print(city)
